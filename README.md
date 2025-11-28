@@ -22,7 +22,7 @@ Digital**.
 
 *(insira a imagem no repositório, exemplo: `assets/architecture.png`)*
 
-![Arquitetura da Solução](assets/architecture.png)
+![Arquitetura da Solução](assets/arquitetura-iara.png)
 
 ------------------------------------------------------------------------
 
