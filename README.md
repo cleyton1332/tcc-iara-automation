@@ -30,17 +30,10 @@ Digital**.
 
     tcc-iara/
     ├─ README.md
-    ├─ docker-compose.yml
     ├─ stack/
     │  ├─ docker-compose.n8n.yml
     │  ├─ docker-compose.evolution.yml
     │  └─ docker-compose.chatwoot.yml
-    ├─ env/
-    │  └─ .env.example
-    ├─ docs/
-    │  ├─ ARCHITECTURE.md
-    │  ├─ DEPLOY.md
-    │  └─ PRESENTATION.md
     └─ assets/
        └─ diagram.drawio
 
