@@ -1,0 +1,55 @@
+version: "3.8"
+
+
+services:
+evolution_api:
+container_name: dev_evolution_api
+image: evoapicloud/evolution-api:v2.3.2
+restart: always
+env_file:
+- ../env/.env.example
+depends_on:
+- evolution_redis
+- evolution_postgres
+volumes:
+- evolution_instances:/evolution/instances
+networks:
+- evo_net
+
+
+evolution_redis:
+image: redis:latest
+container_name: dev_evolution_redis
+restart: always
+command: redis-server --port 6379 --appendonly yes
+volumes:
+- evolution_redis:/data
+networks:
+- evo_net
+
+
+evolution_postgres:
+container_name: dev_evolution_postgres
+image: postgres:15
+restart: always
+environment:
+- POSTGRES_USER=${POSTGRES_USER}
+- POSTGRES_PASSWORD=${POSTGRES_PASSWORD}
+- POSTGRES_DB=${POSTGRES_DB}
+volumes:
+- postgres_data:/var/lib/postgresql/data
+networks:
+- evo_net
+ports:
+- 5433:5432
+
+
+volumes:
+evolution_instances:
+evolution_redis:
+postgres_data:
+
+
+networks:
+evo_net:
+driver: bridge
