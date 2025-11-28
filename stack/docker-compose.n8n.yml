@@ -1,0 +1,68 @@
+version: "3.8"
+- DB_POSTGRESDB_PASSWORD=${DB_POSTGRESDB_PASSWORD}
+- QUEUE_BULL_REDIS_HOST=${QUEUE_BULL_REDIS_HOST}
+- QUEUE_BULL_REDIS_PORT=${QUEUE_BULL_REDIS_PORT}
+- QUEUE_BULL_REDIS_DB=${QUEUE_BULL_REDIS_DB}
+- EXECUTIONS_MODE=queue
+- QUEUE_MODE=redis
+- N8N_HOST=${N8N_HOST}
+- N8N_PORT=${N8N_PORT}
+- N8N_PROTOCOL=${N8N_PROTOCOL}
+- WEBHOOK_URL=${WEBHOOK_URL}
+- N8N_RUNNERS_ENABLED=true
+- N8N_ENFORCE_SETTINGS_FILE_PERMISSIONS=true
+- TZ=${TZ}
+volumes:
+- n8n_dev_data:/home/node/.n8n
+- /home/ubuntu/nginx/public:/data/public
+networks:
+- dev_net
+depends_on:
+- postgres_dev
+- redis_dev
+command: webhook
+
+
+worker_dev:
+image: docker.n8n.io/n8nio/n8n:1.107.4
+container_name: dev_n8n_worker
+restart: unless-stopped
+ports:
+- 5677:5678
+environment:
+- DB_TYPE=${DB_TYPE}
+- DB_POSTGRESDB_HOST=${DB_POSTGRESDB_HOST}
+- DB_POSTGRESDB_PORT=${DB_POSTGRESDB_PORT}
+- DB_POSTGRESDB_DATABASE=${DB_POSTGRESDB_DATABASE}
+- DB_POSTGRESDB_USER=${DB_POSTGRESDB_USER}
+- DB_POSTGRESDB_PASSWORD=${DB_POSTGRESDB_PASSWORD}
+- QUEUE_BULL_REDIS_HOST=${QUEUE_BULL_REDIS_HOST}
+- QUEUE_BULL_REDIS_PORT=${QUEUE_BULL_REDIS_PORT}
+- QUEUE_BULL_REDIS_DB=${QUEUE_BULL_REDIS_DB}
+- EXECUTIONS_MODE=queue
+- QUEUE_MODE=redis
+- N8N_HOST=${N8N_HOST}
+- N8N_PORT=${N8N_PORT}
+- N8N_PROTOCOL=${N8N_PROTOCOL}
+- WEBHOOK_URL=${WEBHOOK_URL}
+- N8N_RUNNERS_ENABLED=true
+- TZ=${TZ}
+volumes:
+- n8n_dev_data:/home/node/.n8n
+- /home/ubuntu/nginx/public:/data/public
+networks:
+- dev_net
+depends_on:
+- postgres_dev
+- redis_dev
+command: worker
+
+
+volumes:
+postgres_dev_data:
+n8n_dev_data:
+
+
+networks:
+dev_net:
+driver: bridge
