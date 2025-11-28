@@ -1,0 +1,97 @@
+version: "3.8"
+
+services:
+  postgres:
+    image: pgvector/pgvector:pg16
+    restart: unless-stopped
+    environment:
+      POSTGRES_DB: chatwoot
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
+    ports:
+      - "6545:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    networks:
+      - chatwoot_net
+
+  redis:
+    image: redis:alpine
+    restart: unless-stopped
+    command: ["sh","-c","redis-server --requirepass \"$REDIS_PASSWORD\""]
+    environment:
+      REDIS_PASSWORD: Sn1ff3R8216
+    volumes:
+      - redis_data:/data
+    networks:
+      - chatwoot_net
+
+  rails:
+    image: chatwoot/chatwoot:v4.6.0
+    depends_on:
+      - postgres
+      - redis
+    environment:
+      NODE_ENV: production
+      RAILS_ENV: production
+      INSTALLATION_ENV: docker
+      SECRET_KEY_BASE: ${SECRET_KEY_BASE}
+      FRONTEND_URL: ${FRONTEND_URL}
+      DATABASE_URL: postgres://postgres:${POSTGRES_PASSWORD}@postgres:5432/chatwoot
+      REDIS_URL: redis://default:${REDIS_PASSWORD}@redis:6379/0
+      RAILS_LOG_TO_STDOUT: "true"
+      ACTION_CABLE_ALLOWED_REQUEST_ORIGINS: '["https://chat.consigia.com.br"]'
+      ENABLE_RACK_ATTACK: "false"
+      DEFAULT_LOCALE: "pt_BR"
+
+      
+    entrypoint: docker/entrypoints/rails.sh
+    command: ["bundle","exec","rails","s","-p","8080","-b","0.0.0.0"]
+    volumes:
+      - storage_data:/app/storage
+    restart: unless-stopped
+    labels:
+      - "traefik.enable=true"
+      - "traefik.http.routers.chatwoot.rule=Host(`chat.consigia.com.br`)"
+      - "traefik.http.routers.chatwoot.entrypoints=websecure"
+      - "traefik.http.routers.chatwoot.tls.certresolver=lets-encrypt"
+      - "traefik.http.services.chatwoot.loadbalancer.server.port=8080"
+      - "traefik.docker.network=consigia-network"
+    networks:
+      - chatwoot_net
+      - consigia-network
+
+  sidekiq:
+    image: chatwoot/chatwoot:v4.6.0
+    depends_on:
+      - postgres
+      - redis
+    environment:
+      NODE_ENV: production
+      RAILS_ENV: production
+      INSTALLATION_ENV: docker
+      SECRET_KEY_BASE: ${SECRET_KEY_BASE}
+      DATABASE_URL: postgres://postgres:${POSTGRES_PASSWORD}@postgres:5432/chatwoot
+      REDIS_URL: redis://default:${REDIS_PASSWORD}@redis:6379/0
+      FRONTEND_URL: https://chat.consigia.com.br
+      ACTIVE_STORAGE_BASE_URL: https://chat.consigia.com.br
+      ENABLE_RACK_ATTACK: "false"
+      DEFAULT_LOCALE: "pt_BR"
+
+    command: ["bundle","exec","sidekiq","-C","config/sidekiq.yml"]
+    volumes:
+      - storage_data:/app/storage
+    restart: unless-stopped
+    networks:
+      - chatwoot_net
+
+volumes:
+  storage_data:
+  postgres_data:
+  redis_data:
+
+networks:
+  chatwoot_net:
+    driver: bridge
+  consigia-network:
+    external: true
