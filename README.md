@@ -90,19 +90,6 @@ Digital**.
 
 ------------------------------------------------------------------------
 
-## ▶️ Como Apresentar para a Banca
-
-1.  Abra o **Portainer** e mostre as três stacks rodando\
-2.  Demonstre:
-    -   Fluxo N8N funcionando
-    -   Conversa no Chatwoot chegando no bot
-    -   Consulta via Evolution API funcionando\
-3.  Mostre o diagrama de arquitetura\
-4.  Mostre o código de automação (workflows)\
-5.  Conclua exibindo logs e execução em tempo real
-
-------------------------------------------------------------------------
-
 ## 📱 Contato do Projeto
 
 Para demonstração:\
